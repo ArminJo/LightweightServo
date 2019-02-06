@@ -27,4 +27,5 @@ notifications:
     on_failure: always
 env:
   global:
+    - PRETTYNAME="LightweightServo Arduino Library"
     - ARDUINO_IDE_VERSION="1.8.8"

@@ -9,6 +9,13 @@
  *  Copyright (C) 2019  Armin Joachimsmeyer
  *  armin.joachimsmeyer@gmail.com
  *
+ *  This file is part of ServoEasing https://github.com/ArminJo/ServoEasing.
+ *
+ *  ServoEasing is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,21 +27,23 @@
  */
 
 #include <Arduino.h>
-#include <LightweightServo.h>
+#include "LightweightServo.h"
 
 #if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
-//#define DISABLE_SERVO_TIMER_AUTO_INITIALIZE // outcommenting this saves 70 bytes flash memory if you use the init function initLightweightServoPin9And10() manually.
+/*
+ * Outcommenting this saves 70 bytes flash memory. You must then use the init function initLightweightServoPin9And10() manually.
+ */
+//#define DISABLE_SERVO_TIMER_AUTO_INITIALIZE
 
 #define COUNT_FOR_20_MILLIS 40000 // you can modify this if you have servos which accept a higher rate
 
 /*
  * Variables to enable adjustment for different servo types
- * Resolution is 1/2 microseconds, so values are twice the microseconds!!!
- * 1088 and 4800 are values compatible with standard arduino values
+ * 544 and 2400 are values compatible with standard arduino values
  * 4 bytes RAM compared to 48 bytes for standard Arduino library
  */
-int sServoPulseWidthFor0Degree = 1088;
-int sServoPulseWidthFor180Degree = 4800;
+int sMicrosecondsForServo0Degree = 544;
+int sMicrosecondsForServo180Degree = 2400;
 
 /*
  * Use 16 bit timer1 for generating 2 servo signals entirely by hardware without any interrupts.
@@ -88,7 +97,15 @@ void initLightweightServoPin9_10(bool aUsePin9, bool aUsePin10) {
  * If aUsePin9 is false, then Pin10 is used
  * 236 / 186(without auto init) bytes code size
  */
-void setLightweightServoPulse(int aValue, bool aUsePin9, bool aUpdateFast) {
+int writeLightweightServo(int aValue, bool aUsePin9, bool aUpdateFast) {
+    if (aValue <= 180) {
+        aValue = DegreeToMicrosecondsLightweightServo(aValue);
+    }
+    writeMicrosecondsLightweightServo(aValue, aUsePin9, aUpdateFast);
+    return aValue;
+}
+
+void writeMicrosecondsLightweightServo(int aMicroseconds, bool aUsePin9, bool aUpdateFast) {
 #ifndef DISABLE_SERVO_TIMER_AUTO_INITIALIZE
     // auto initialize
     if ((TCCR1B != (_BV(WGM13) | _BV(WGM12) | _BV(CS11))) || (aUsePin9 && ((TCCR1A & ~_BV(COM1B1)) != (_BV(COM1A1) | _BV(WGM11))))
@@ -96,12 +113,8 @@ void setLightweightServoPulse(int aValue, bool aUsePin9, bool aUpdateFast) {
         initLightweightServoPin9_10(aUsePin9, !aUsePin9);
     }
 #endif
-    if (aValue <= 180) {
-        aValue = map(aValue, 0, 180, sServoPulseWidthFor0Degree, sServoPulseWidthFor180Degree);
-    } else {
-// since the resolution is 1/2 of microsecond
-        aValue *= 2;
-    }
+    // since the resolution is 1/2 of microsecond
+    aMicroseconds *= 2;
     if (aUpdateFast) {
         uint16_t tTimerCount = TCNT1;
         if (tTimerCount > 10000) {
@@ -110,43 +123,47 @@ void setLightweightServoPulse(int aValue, bool aUsePin9, bool aUpdateFast) {
         }
     }
     if (aUsePin9) {
-        OCR1A = aValue;
+        OCR1A = aMicroseconds;
     } else {
-        OCR1B = aValue;
+        OCR1B = aMicroseconds;
     }
 }
 
 /*
  * Set the mapping pulse width values for 0 and 180 degree
  */
-void setLightweightServoPulseMicrosFor0And180Degree(int a0DegreeValue, int a180DegreeValue) {
-// *2 since internal values are meant for the 1/2 microseconds resolution of timer
-    sServoPulseWidthFor0Degree = a0DegreeValue * 2;
-    sServoPulseWidthFor180Degree = a180DegreeValue * 2;
+void setLightweightServoPulseMicrosFor0And180Degree(int aMicrosecondsForServo0Degree, int aMicrosecondsForServo180Degree) {
+    sMicrosecondsForServo0Degree = aMicrosecondsForServo0Degree;
+    sMicrosecondsForServo180Degree = aMicrosecondsForServo180Degree;
 }
 
 /*
  * Pin 9 / Channel A. If value is below 180 then assume degree, otherwise assume microseconds
  */
-void setLightweightServoPulsePin9(int aValue, bool aUpdateFast) {
-    setLightweightServoPulse(aValue, true, aUpdateFast);
+void write9(int aValue, bool aUpdateFast) {
+    writeLightweightServo(aValue, true, aUpdateFast);
 }
 
+void writeMicroseconds9(int aMicroseconds, bool aUpdateFast) {
+    writeMicrosecondsLightweightServo(aMicroseconds, true, aUpdateFast);
+}
 /*
  * Pin 10 / Channel B
  */
-void setLightweightServoPulsePin10(int aValue, bool aUpdateFast) {
-    setLightweightServoPulse(aValue, false, aUpdateFast);
+void write10(int aValue, bool aUpdateFast) {
+    writeLightweightServo(aValue, false, aUpdateFast);
 }
 
-int getMicrosFromDegree(int aValueDegree) {
-    // sServoPulseWidth... has a resolution of 1/2 microsecond
-    return (map(aValueDegree, 0, 180, sServoPulseWidthFor0Degree, sServoPulseWidthFor180Degree) / 2);
+void writeMicroseconds10(int aMicroseconds, bool aUpdateFast) {
+    writeMicrosecondsLightweightServo(aMicroseconds, false, aUpdateFast);
 }
 
-int getDegreeFromMicros(int aValueMicros) {
-    // sServoPulseWidth... has a resolution of 1/2 microsecond
-    return map((aValueMicros * 2), sServoPulseWidthFor0Degree, sServoPulseWidthFor180Degree, 0, 180);
+int DegreeToMicrosecondsLightweightServo(int aValueDegree) {
+    return (map(aValueDegree, 0, 180, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree));
+}
+
+int MicrosecondsToDegreeLightweightServo(int aValueMicros) {
+    return map(aValueMicros, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree, 0, 180);
 }
 
 #endif
