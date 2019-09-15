@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/ArminJo/LightweightServo.svg?branch=master)](https://travis-ci.org/ArminJo/LightweightServo)
 
 ## Small servo library for Arduino
+ *  comparable to [Adafruit_TiCoServo library](https://github.com/adafruit/Adafruit_TiCoServo)
+ *  Enables use of NeoPixels and servos in the same Arduino sketch
  *  Lightweight Servo implementation only for pin 9 and 10.
  *  Only timer1 hardware and no interrupts or other overhead used.
  *  Provides auto initialization.
