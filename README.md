@@ -2,6 +2,7 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/ArminJo/LightweightServo.svg?branch=master)](https://travis-ci.org/ArminJo/LightweightServo)
+[![Hit Counter](https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fgithub.com%2FArminJo%2FLightweightServo)](https://github.com/brentvollebregt/hit-counter)
 
 ## Small servo library for Arduino
  *  comparable to [Adafruit_TiCoServo library](https://github.com/adafruit/Adafruit_TiCoServo)
