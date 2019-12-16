@@ -1,33 +1,25 @@
 language: c
-before_install:
-  - echo "get virtual display for Arduino IDE using xvfb"
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
-  - sleep 3
-  - export DISPLAY=:1.0
-  - echo "Downloading version $ARDUINO_IDE_VERSION of the Arduino IDE..."  
-  - wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
-  - echo "Extracting the Arduino IDE..."  
-  - tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
-  - echo "Moving Arduino IDE..."  
-  - sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino
-  - echo "Linking Arduino IDE..."
-  - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
-  - echo "Removing Arduino IDE ver $ARDUINO_IDE_VERSION tar that was downloaded..."
-  - rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz  
-
-install:
-  - ln -s $PWD /usr/local/share/arduino/libraries/LightweightServo
-
-script:
-  - arduino --verify --board arduino:avr:uno $PWD/examples/TwoServos/TwoServos.ino
-
-notifications:
-  email:
-    recipients:
-      - armin.arduino@gmail.com
-    on_success: always
-    on_failure: always
+sudo: false
+cache:
+   directories:
+   - ~/arduino_ide
+   - ~/.arduino15/packages/
+git:
+   depth: false
+   quiet: true
 env:
-  global:
-    - PRETTYNAME="LightweightServo Arduino Library"
-    - ARDUINO_IDE_VERSION="1.8.8"
+   global:
+   - PRETTYNAME="LightweightServo Arduino Library"
+   - INSTALL_PLATFORMS="avr"
+#--verbose --verbose-build --version
+   - ARDUINO_SWITCHES="--verbose-build"
+before_install:
+- source <(curl -SLs https://raw.githubusercontent.com/ArminJo/travis-ci-arduino/master/install.sh)
+script:
+- build_platform uno
+notifications:
+   email:
+      recipients:
+      - armin.arduino@gmail.com
+      on_success: always
+      on_failure: always
