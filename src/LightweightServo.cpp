@@ -26,15 +26,14 @@
  *
  */
 
+#ifndef LIGHTWEIGHT_SERVO_HPP
+#define LIGHTWEIGHT_SERVO_HPP
+
 #include <Arduino.h>
 
-#if defined (__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 #include "LightweightServo.h"
 
-/*
- * Commenting out this saves 70 bytes flash memory. You must then use the init function initLightweightServoPin9And10() manually.
- */
-//#define DISABLE_SERVO_TIMER_AUTO_INITIALIZE
 /*
  * Variables to enable adjustment for different servo types
  * 544 and 2400 are values compatible with standard arduino values
@@ -57,43 +56,66 @@ void initLightweightServoPin9And10() {
     DDRB |= _BV(DDB1) | _BV(DDB2);                // set pins OC1A = PortB1 -> PIN 9 and OC1B = PortB2 -> PIN 10 to output direction
     TCCR1A = _BV(COM1A1) | _BV(COM1B1) | _BV(WGM11); // FastPWM Mode mode TOP (20 ms) determined by ICR1 - non-inverting Compare Output mode OC1A+OC1B
     TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11);    // set prescaler to 8, FastPWM mode mode bits WGM13 + WGM12
-    ICR1 = ISR1_COUNT_FOR_20_MILLIS;  // set period to 20 ms
+    ICR1 = ISR1_COUNT_FOR_20_MILLIS;                 // set period to 20 ms
     // do not set counter here, since with counter = 0 (default) no output signal is generated.
 }
 
 /*
  * Use 16 bit timer1 for generating 2 servo signals entirely by hardware without any interrupts.
  * Use FastPWM mode and generate pulse at start of the 20 ms period
- * The 2 servo signals are tied to pin 9 and 10 of an 328.
+ * The 2 servo signals are tied to pin 9 and 10 of an ATMega328.
  * Attention - the selected pin is set to OUTPUT here!
  * 54 bytes code size
  */
 void initLightweightServoPin9_10(bool aUsePin9, bool aUsePin10) {
 
     uint8_t tNewTCCR1A = TCCR1A & (_BV(COM1A1) | _BV(COM1B1)); // keep existing COM1A1 and COM1B1 settings
-    tNewTCCR1A |= _BV(WGM11); // FastPWM Mode mode TOP (20 ms) determined by ICR1
+    tNewTCCR1A |= _BV(WGM11);                       // FastPWM Mode mode TOP (20 ms) determined by ICR1
 
     if (aUsePin9) {
-        DDRB |= _BV(DDB1);   // set OC1A = PortB1 -> PIN 9 to output direction
-        tNewTCCR1A |= _BV(COM1A1); // non-inverting Compare Output mode OC1A
-    }
+        DDRB |= _BV(DDB1);                          // set OC1A = PortB1 -> PIN 9 to output direction
+        tNewTCCR1A |= _BV(COM1A1);                  // non-inverting Compare Output mode OC1A
+        OCR1A = 0xFFFF;                                 // Set counter > ICR1 here, to avoid output signal generation.
+   }
     if (aUsePin10) {
-        DDRB |= _BV(DDB2);   // set OC1B = PortB2 -> PIN 10 to output direction
-        tNewTCCR1A |= _BV(COM1B1); // non-inverting Compare Output mode OC1B
+        DDRB |= _BV(DDB2);                          // set OC1B = PortB2 -> PIN 10 to output direction
+        tNewTCCR1A |= _BV(COM1B1);                  // non-inverting Compare Output mode OC1B
+        OCR1B = 0xFFFF;                                 // Set counter > ICR1 here, to avoid output signal generation.
     }
     TCCR1A = tNewTCCR1A;
-    TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11);    // set prescaler to 8, FastPWM Mode mode bits WGM13 + WGM12
-    ICR1 = ISR1_COUNT_FOR_20_MILLIS;  // set period to 20 ms
-    // Do not set counter here, since with counter = 0 (default) no output signal is generated now.
+    TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11);   // set prescaler to 8, FastPWM Mode mode bits WGM13 + WGM12
+    ICR1 = ISR1_COUNT_FOR_20_MILLIS;                // set period to 20 ms
 }
 
-void deinitLightweightServoPin9_10(bool aUsePin9) {
+/*
+ * Disables Pin 10!
+ */
+void initLightweightServoPin9() {
+    DDRB |= _BV(DDB1);                              // set OC1A = PortB1 -> PIN 9 to output direction
+    TCCR1A = _BV(WGM11) | _BV(COM1A1);  //  FastPWM Mode mode TOP (20 ms) determined by ICR1, non-inverting Compare Output mode OC1A
+    TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11);   // set prescaler to 8, FastPWM Mode mode bits WGM13 + WGM12
+    ICR1 = ISR1_COUNT_FOR_20_MILLIS;                // set period to 20 ms
+    OCR1A = 0xFFFF;                                 // Set counter > ICR1 here, to avoid output signal generation.
+}
+/*
+ * Disables Pin 9!
+ */
+void initLightweightServoPin10() {
+    DDRB |= _BV(DDB2);                              // set OC1B = PortB2 -> PIN 10 to output direction
+    TCCR1A = _BV(WGM11) | _BV(COM1B1);  //  FastPWM Mode mode TOP (20 ms) determined by ICR1, non-inverting Compare Output mode OC1B
+    TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS11);   // set prescaler to 8, FastPWM Mode mode bits WGM13 + WGM12
+    ICR1 = ISR1_COUNT_FOR_20_MILLIS;                // set period to 20 ms
+    OCR1B = 0xFFFF;                                 // Set counter > ICR1 here, to avoid output signal generation.
+}
+
+void deinitLightweightServoPin9_10(bool aUsePin9, bool aUsePin10) {
     if (aUsePin9) {
-        DDRB &= ~(_BV(DDB1));   // set OC1A = PortB1 -> PIN 9 to input direction
-        TCCR1A &= ~(_BV(COM1A1)); // disable non-inverting Compare Output mode OC1A
-    } else {
-        DDRB &= ~(_BV(DDB2));   // set OC1B = PortB2 -> PIN 10 to input direction
-        TCCR1A &= ~(_BV(COM1B1)); // disable non-inverting Compare Output mode OC1B
+        DDRB &= ~(_BV(DDB1));           // set OC1A = PortB1 -> PIN 9 to input direction
+        TCCR1A &= ~(_BV(COM1A1));       // disable non-inverting Compare Output mode OC1A
+    }
+    if (aUsePin10) {
+        DDRB &= ~(_BV(DDB2));           // set OC1B = PortB2 -> PIN 10 to input direction
+        TCCR1A &= ~(_BV(COM1B1));       // disable non-inverting Compare Output mode OC1B
     }
 }
 
@@ -103,12 +125,12 @@ void deinitLightweightServoPin9_10(bool aUsePin9) {
  * If aUsePin9 is false, then Pin10 is used
  * 236 / 186(without auto init) bytes code size
  */
-int writeLightweightServo(int aValue, bool aUsePin9, bool aUpdateFast) {
-    if (aValue <= 180) {
-        aValue = DegreeToMicrosecondsLightweightServo(aValue);
+int writeLightweightServo(int aDegree, bool aUsePin9, bool aUpdateFast) {
+    if (aDegree <= 180) {
+        aDegree = DegreeToMicrosecondsLightweightServo(aDegree);
     }
-    writeMicrosecondsLightweightServo(aValue, aUsePin9, aUpdateFast);
-    return aValue;
+    writeMicrosecondsLightweightServo(aDegree, aUsePin9, aUpdateFast);
+    return aDegree;
 }
 
 void writeMicrosecondsLightweightServo(int aMicroseconds, bool aUsePin9, bool aUpdateFast) {
@@ -153,8 +175,8 @@ void setLightweightServoPulseMicrosFor0And180Degree(int aMicrosecondsForServo0De
 /*
  * Pin 9 / Channel A. If value is below 180 then assume degree, otherwise assume microseconds
  */
-void write9(int aValue, bool aUpdateFast) {
-    writeLightweightServo(aValue, true, aUpdateFast);
+void write9(int aDegree, bool aUpdateFast) {
+    writeLightweightServo(aDegree, true, aUpdateFast);
 }
 
 void writeMicroseconds9(int aMicroseconds, bool aUpdateFast) {
@@ -171,8 +193,8 @@ void writeMicroseconds9Direct(int aMicroseconds) {
 /*
  * Pin 10 / Channel B
  */
-void write10(int aValue, bool aUpdateFast) {
-    writeLightweightServo(aValue, false, aUpdateFast);
+void write10(int aDegree, bool aUpdateFast) {
+    writeLightweightServo(aDegree, false, aUpdateFast);
 }
 
 void writeMicroseconds10(int aMicroseconds, bool aUpdateFast) {
@@ -189,13 +211,14 @@ void writeMicroseconds10Direct(int aMicroseconds) {
 /*
  * Conversion functions
  */
-int DegreeToMicrosecondsLightweightServo(int aValueDegree) {
-    return (map(aValueDegree, 0, 180, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree));
+int DegreeToMicrosecondsLightweightServo(int aDegree) {
+    return (map(aDegree, 0, 180, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree));
 }
 
-int MicrosecondsToDegreeLightweightServo(int aValueMicros) {
-    return map(aValueMicros, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree, 0, 180);
+int MicrosecondsToDegreeLightweightServo(int aMicroseconds) {
+    return map(aMicroseconds, sMicrosecondsForServo0Degree, sMicrosecondsForServo180Degree, 0, 180);
 }
 
-#endif
-
+#endif // defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
+#endif // #ifndef LIGHTWEIGHT_SERVO_HPP
+#pragma once
