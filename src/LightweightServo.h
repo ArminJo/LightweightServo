@@ -17,12 +17,12 @@
  *  GNU General Public License for more details.
 
  *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/gpl.html>.
+ *  along with this program. If not, see <http://www.gnu.org/licenses/gpl.html>.
  *
  */
 
-#ifndef LIGHTWEIGHT_SERVO_H_
-#define LIGHTWEIGHT_SERVO_H_
+#ifndef _LIGHTWEIGHT_SERVO_H
+#define _LIGHTWEIGHT_SERVO_H
 
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)
 
@@ -33,7 +33,7 @@
 #include <stdint.h>
 
 /*
- * Commenting out this saves 70 bytes flash memory. You must then use the init function initLightweightServoPin9And10() manually.
+ * Activating this saves 70 bytes program space. You must then use the init functions initLightweightServoPin*() manually.
  */
 //#define DISABLE_SERVO_TIMER_AUTO_INITIALIZE
 #define ISR1_COUNT_FOR_20_MILLIS 40000 // you can modify this if you have servos which accept a higher rate
@@ -73,6 +73,4 @@ int MicrosecondsToDegreeLightweightServo(int aMicroseconds);
  * - Improved API.
  */
 
-#endif // LIGHTWEIGHT_SERVO_H_
-
-#pragma once
+#endif // _LIGHTWEIGHT_SERVO_H
