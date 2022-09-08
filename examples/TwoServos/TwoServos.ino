@@ -18,7 +18,7 @@
 
 #include <Arduino.h>
 
-#include "LightweightServo.h"
+#include "LightweightServo.hpp"
 
 #define VERSION_EXAMPLE "1.0"
 
