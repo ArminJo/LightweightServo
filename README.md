@@ -13,7 +13,7 @@ This library is contained in the Arduino [SevoEasing](https://github.com/ArminJo
  *  Comparable to [Adafruit_TiCoServo library](https://github.com/adafruit/Adafruit_TiCoServo).
  *  No problems with **servo twitching**.
  *  Enables use of NeoPixels, SoftwareSerial, and DmxSimple together with servos in the same Arduino sketch.
- *  LightweightServo implementation **only for pin 9 and 10** of Arduino UNO, Nano etc..
+ *  LightweightServo implementation **only for pin 9 and 10** of Arduino Uno, Nano etc..
  *  Only timer1 hardware and **no interrupts or other overhead** used.
  *  Provides **auto initialization**.
  *  **Save up to 600 bytes program size** / 40 bytes RAM including auto initialization compared to Arduino Servo library.
