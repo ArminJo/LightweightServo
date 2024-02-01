@@ -1,12 +1,29 @@
-# LightweightServo
+<div align = center>
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Commits since latest](https://img.shields.io/github/commits-since/ArminJo/LightweightServo/latest)](https://github.com/ArminJo/LightweightServo/commits/master)
-[![Build Status](https://github.com/ArminJo/LightweightServo/workflows/LibraryBuild/badge.svg)](https://github.com/ArminJo/LightweightServo/actions)
-![Hit Counter](https://visitor-badge.laobi.icu/badge?page_id=ArminJo_LightweightServo)
+# [LightweightServo](https://github.com/ArminJo/LightweightServo)
 
+[![Badge License: GPLv3](https://img.shields.io/badge/License-GPLv3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
+ &nbsp; &nbsp;
+[![Badge Version](https://img.shields.io/github/v/release/ArminJo/LightweightServo?include_prereleases&color=yellow&logo=DocuSign&logoColor=white)](https://github.com/ArminJo/LightweightServo/releases/latest)
+ &nbsp; &nbsp;
+[![Badge Commits since latest](https://img.shields.io/github/commits-since/ArminJo/LightweightServo/latest?color=yellow)](https://github.com/ArminJo/LightweightServo/commits/master)
+ &nbsp; &nbsp;
+[![Badge Build Status](https://github.com/ArminJo/LightweightServo/workflows/LibraryBuild/badge.svg)](https://github.com/ArminJo/LightweightServo/actions)
+ &nbsp; &nbsp;
+![Badge Hit Counter](https://visitor-badge.laobi.icu/badge?page_id=ArminJo_LightweightServo)
+<br/>
+<br/>
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://stand-with-ukraine.pp.ua)
 
-### Included in the Arduino library [ServoEasing](https://github.com/ArminJo/ServoEasing)
+Part of the Arduino library [ServoEasing](https://github.com/ArminJo/ServoEasing)
+
+[![Button Changelog](https://img.shields.io/badge/Changelog-blue?logoColor=white&logo=AzureArtifacts)](https://github.com/ArminJo/LightweightServo#revision-history)
+
+</div>
+
+#### If you find this library useful, please give it a star.
+
+&#x1F30E; [Google Translate](https://translate.google.com/translate?sl=en&u=https://github.com/ArminJo/LightweightServo)
 
 ## Small servo library for Arduino
 This library is contained in the Arduino [SevoEasing](https://github.com/ArminJo/ServoEasing) library.
@@ -16,6 +33,7 @@ This library is contained in the Arduino [SevoEasing](https://github.com/ArminJo
  *  LightweightServo implementation **only for pin 9 and 10** of Arduino Uno, Nano etc..
  *  Only timer1 hardware and **no interrupts or other overhead** used.
  *  Provides **auto initialization**.
+ *  Supports F_CPU of 16, 8, 4, 2, 1 MHz.
  *  **Save up to 600 bytes program size** / 40 bytes RAM including auto initialization compared to Arduino Servo library.
  *  8 bytes for each call to `write9()` or `write10()`.
 
@@ -47,20 +65,5 @@ Most macros must be defined in your program before the line `#include <Lightweig
 Modify them by enabling / disabling them, or change the values if applicable.
 
 | Name | Default value | Description |
-|-|-|-|-|
+|-|-:|-|
 | `DISABLE_SERVO_TIMER_AUTO_INITIALIZE` | disabled | Saves up to 60 bytes flash memory. You must then use the init function `initLightweightServoPin9And10()` or `initLightweightServoPin9_10()` manually. |
-
-### Changing include (*.h) files with Arduino IDE
-First, use *Sketch > Show Sketch Folder (Ctrl+K)*.<br/>
-If you have not yet saved the example as your own sketch, then you are instantly in the right library folder.<br/>
-Otherwise you have to navigate to the parallel `libraries` folder and select the library you want to access.<br/>
-In both cases the library source and include files are located in the libraries `src` directory.<br/>
-The modification must be renewed for each new library version!
-
-### Modifying compile options / macros with PlatformIO
-If you are using PlatformIO, you can define the macros in the *[platformio.ini](https://docs.platformio.org/en/latest/projectconf/section_env_build.html)* file with `build_flags = -D MACRO_NAME` or `build_flags = -D MACRO_NAME=macroValue`.
-
-### Modifying compile options / macros with Sloeber IDE
-If you are using [Sloeber](https://eclipse.baeyens.it) as your IDE, you can easily define global symbols with *Properties > Arduino > CompileOptions*.<br/>
-![Sloeber settings](https://github.com/Arduino-IRremote/Arduino-IRremote/blob/master/pictures/SloeberDefineSymbols.png)
-
