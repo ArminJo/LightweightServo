@@ -34,27 +34,33 @@ void loop() {
     /*
      * Let the servo at pin 9 swipe from 0 to 180 and back to 90 degree
      */
+    Serial.println(F("Move 9 to 0 degree"));
     write9(0);
     delay(1500);
+    Serial.println(F("Move 9 to 180 degree"));
     write9(180);
     delay(1000);
+    Serial.println(F("Move 9 to 90 degree"));
     write9(90);
     delay(1000);
 
     /*
      * Now move servo at pin 10
      */
+    Serial.println(F("Move 10 to 0 degree"));
     write10(0);
     delay(1500);
+    Serial.println(F("Move 10 to 180 degree"));
     write10(180);
     delay(1000);
+    Serial.println(F("Move 10 to 90 degree"));
     write10(90);
     delay(1000);
 
     /*
      * Move both servos to 45 degree using microseconds as parameter
      */
-    Serial.print("45 degree = ");
+    Serial.print("Move both to 45 degree = ");
     Serial.print(MicrosecondsToDegreeLightweightServo(45));
     Serial.println(" micro seconds");
     writeMicroseconds9(1008);

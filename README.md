@@ -17,7 +17,7 @@
 
 Part of the Arduino library [ServoEasing](https://github.com/ArminJo/ServoEasing)
 
-[![Button Changelog](https://img.shields.io/badge/Changelog-blue?logoColor=white&logo=AzureArtifacts)](https://github.com/ArminJo/LightweightServo#revision-history)
+[![Button Changelog](https://img.shields.io/badge/Changelog-blue?logoColor=white&logo=AzureArtifacts)](https://github.com/ArminJo/LightweightServo?tab=readme-ov-file#revision-history)
 
 </div>
 
